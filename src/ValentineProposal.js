@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Heart, Sparkles, Gift } from 'lucide-react';
 
+const FORM_ENDPOINT = "https://formspree.io/f/mpwqlrqn"; // Replace with your Formspree endpoint
+
+
 const ValentineProposal = () => {
   const [stage, setStage] = useState(0);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
@@ -28,16 +31,34 @@ const ValentineProposal = () => {
     setStage(2);
   };
 
-  const handleQuestionSubmit = () => {
+  const handleQuestionSubmit = async () => {
     const currentKey = questions[currentQuestionIndex].key;
+  
     if (answers[currentKey].trim() !== '') {
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
-        setStage(3);
+        // SUBMIT FORM DATA TO FORMSPREE
+        try {
+          const response = await fetch("https://formspree.io/f/yourformid", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(answers),
+          });
+  
+          if (response.ok) {
+            setStage(3); // Move to the final confirmation stage
+          } else {
+            alert("Something went wrong. Please try again.");
+          }
+        } catch (error) {
+          console.error("Form submission error:", error);
+          alert("Error submitting form. Try again!");
+        }
       }
     }
   };
+  
 
   const questions = [
     {
@@ -130,80 +151,85 @@ const ValentineProposal = () => {
           </div>
         )}
 
-        {stage === 2 && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
-            <div className="flex justify-center mb-4">
-              {questions[currentQuestionIndex].icon}
-            </div>
-            <h2 className="text-3xl font-bold text-rose-600 mb-6">
-              Let's Get to Know Each Other Better
-            </h2>
-            <div className="space-y-4">
-              <p className="text-xl text-rose-800 mb-4">
-                {questions[currentQuestionIndex].prompt}
-              </p>
-              <input 
-                type="text"
-                value={answers[questions[currentQuestionIndex].key]}
-                onChange={(e) => setAnswers(prev => ({
-                  ...prev, 
-                  [questions[currentQuestionIndex].key]: e.target.value
-                }))}
-                placeholder={`Your answer to "${questions[currentQuestionIndex].prompt}"`}
-                className="w-full p-3 rounded-lg border-2 border-rose-300 focus:outline-none focus:border-rose-500"
-              />
-              <button 
-                onClick={handleQuestionSubmit}
-                className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600 transition duration-300 text-xl font-semibold w-full"
-              >
-                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish'}
-              </button>
-            </div>
-          </div>
-        )}
+{stage === 2 && (
+  <form
+    action="https://formspree.io/f/mpwqlrqn"  // Your Formspree endpoint
+    method="POST"
+    className="space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl"
+  >
+    <div className="flex justify-center mb-4">
+      <Heart className="text-rose-500" size={64} />
+    </div>
+    <h2 className="text-3xl font-bold text-rose-600 mb-6">
+      Let's Get to Know Each Other Better
+    </h2>
+    
+    {/* Dream Date */}
+    <label className="block">
+      What's your dream date? 🌟
+      <input
+        type="text"
+        name="dreamDate"  // Adding 'name' to map the form data
+        value={answers.dreamDate}
+        onChange={(e) => setAnswers({ ...answers, dreamDate: e.target.value })}
+        required
+        className="w-full p-2 mt-1 border rounded-md"
+      />
+    </label>
 
-        {stage === 3 && (
-          <>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl mb-6">
-              <div className="flex justify-center mb-4">
-                <Heart className="text-rose-500" size={48} />
-              </div>
-              <h3 className="text-2xl font-bold text-rose-600 mb-4">
-                My Love for You
-              </h3>
-              <p className="text-xl text-rose-800">
-                I just love you bhot sara Love ❤️ 
-                Every moment with you is a treasure, 
-                and my heart beats only for you.
-              </p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
-              <h4 className="text-2xl font-semibold text-rose-600 mb-4">
-                Our Special Moments
-              </h4>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Heart className="text-rose-500 mr-3" size={24} />
-                  <p className="text-rose-800">
-                    <strong>Dream Date:</strong> {answers.dreamDate}
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <Sparkles className="text-rose-500 mr-3" size={24} />
-                  <p className="text-rose-800">
-                    <strong>Romantic Gesture:</strong> {answers.romanticGesture}
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <Gift className="text-rose-500 mr-3" size={24} />
-                  <p className="text-rose-800">
-                    <strong>Special Moment:</strong> {answers.specialMoment}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+    {/* Romantic Gesture */}
+    <label className="block">
+      What's the most romantic gesture I did that you love most? 💕
+      <input
+        type="text"
+        name="romanticGesture"  // Adding 'name' to map the form data
+        value={answers.romanticGesture}
+        onChange={(e) => setAnswers({ ...answers, romanticGesture: e.target.value })}
+        required
+        className="w-full p-2 mt-1 border rounded-md"
+      />
+    </label>
+
+    {/* Special Moment */}
+    <label className="block">
+      What's a special moment we've shared? ✨
+      <input
+        type="text"
+        name="specialMoment"  // Adding 'name' to map the form data
+        value={answers.specialMoment}
+        onChange={(e) => setAnswers({ ...answers, specialMoment: e.target.value })}
+        required
+        className="w-full p-2 mt-1 border rounded-md"
+      />
+    </label>
+
+    <button
+      type="submit"
+      className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600 transition duration-300 text-xl font-semibold w-full"
+    >
+      Submit 💌
+    </button>
+  </form>
+)}
+
+
+{stage === 3 && (
+  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
+    <div className="flex justify-center mb-4">
+      <Heart className="text-rose-500" size={48} />
+    </div>
+    <h3 className="text-2xl font-bold text-rose-600 mb-4">
+      Thank You for Answering! ❤️
+    </h3>
+    <p className="text-xl text-rose-800">
+      Your responses have been sent to me! I'll treasure them forever. 💕
+    </p>
+    <p className="text-gray-600 text-sm mt-4">
+      (Check your email if you used a valid one!)
+    </p>
+  </div>
+)}
+
       </div>
     </div>
   );
