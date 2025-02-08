@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { Heart, Sparkles, Gift } from 'lucide-react';
 
-const FORM_ENDPOINT = "https://formspree.io/f/mpwqlrqn"; // Replace with your Formspree endpoint
-
-
 const ValentineProposal = () => {
   const [stage, setStage] = useState(0);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [fadeOut, setFadeOut] = useState(false);
   const [answers, setAnswers] = useState({
     dreamDate: '',
     romanticGesture: '',
@@ -24,59 +21,20 @@ const ValentineProposal = () => {
   };
 
   const handleYesClick = () => {
-    setStage(1);
+    setFadeOut(true);
+    setTimeout(() => {
+      setStage(1);
+      setFadeOut(false);
+    }, 500);
   };
 
   const handleNextStage = () => {
-    setStage(2);
+    setFadeOut(true);
+    setTimeout(() => {
+      setStage(2);
+      setFadeOut(false);
+    }, 500);
   };
-
-  const handleQuestionSubmit = async () => {
-    const currentKey = questions[currentQuestionIndex].key;
-  
-    if (answers[currentKey].trim() !== '') {
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-      } else {
-        // SUBMIT FORM DATA TO FORMSPREE
-        try {
-          const response = await fetch("https://formspree.io/f/yourformid", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(answers),
-          });
-  
-          if (response.ok) {
-            setStage(3); // Move to the final confirmation stage
-          } else {
-            alert("Something went wrong. Please try again.");
-          }
-        } catch (error) {
-          console.error("Form submission error:", error);
-          alert("Error submitting form. Try again!");
-        }
-      }
-    }
-  };
-  
-
-  const questions = [
-    {
-      key: 'dreamDate',
-      prompt: "What's your dream date with me?",
-      icon: <Heart className="text-rose-500" size={36} />
-    },
-    {
-      key: 'romanticGesture',
-      prompt: "What's the most romantic gesture I did that you love most?",
-      icon: <Sparkles className="text-rose-500" size={36} />
-    },
-    {
-      key: 'specialMoment',
-      prompt: "What's a special moment we've shared?",
-      icon: <Gift className="text-rose-500" size={36} />
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-pink-200 to-rose-300 flex flex-col items-center justify-center p-4 text-center overflow-hidden relative">
@@ -98,7 +56,7 @@ const ValentineProposal = () => {
       </div>
 
       {/* Main Content */}
-      <div className="z-10 space-y-6 w-full max-w-md">
+      <div className={`z-10 space-y-6 w-full max-w-md transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
         {stage === 0 && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
             <h1 className="text-3xl font-bold text-rose-600 mb-6">
@@ -131,17 +89,25 @@ const ValentineProposal = () => {
             <div className="flex justify-center mb-4">
               <Heart className="text-rose-500" size={64} />
             </div>
-            <h2 className="text-3xl font-bold text-rose-600 mb-6">
-              Yay!! 💕
-            </h2>
-            <p className="text-xl text-rose-800 mb-6">
-              I wanted this to happen very badly, only with you!
-            </p>
             <img 
-              src="https://via.placeholder.com/400x300" 
-              alt="Placeholder" 
-              className="mx-auto rounded-lg mb-6"
+              src="https://i.postimg.cc/Z5fWK8jv/Her.jpg"
+              alt="Your eyes" 
+              className="mx-auto rounded-lg mb-6 shadow-lg"
             />
+            <div className="space-y-4 mb-8">
+              <p className="text-xl text-rose-800 italic font-serif">
+                In depths of amber, honey-touched with gold,
+                Your eyes hold stories that remain untold.
+                Like starlit pools in evening's gentle grace,
+                They shine with warmth that time cannot erase.
+              </p>
+              <p className="text-xl text-rose-800 italic font-serif">
+                A universe of dreams within their glow,
+                Your eyes speak truths that only hearts can know.
+                In them I see my future, clear and bright,
+                A love that guides me through the darkest night.
+              </p>
+            </div>
             <button 
               onClick={handleNextStage}
               className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600 transition duration-300 text-xl font-semibold"
@@ -151,85 +117,80 @@ const ValentineProposal = () => {
           </div>
         )}
 
-{stage === 2 && (
-  <form
-    action="https://formspree.io/f/mpwqlrqn"  // Your Formspree endpoint
-    method="POST"
-    className="space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl"
-  >
-    <div className="flex justify-center mb-4">
-      <Heart className="text-rose-500" size={64} />
-    </div>
-    <h2 className="text-3xl font-bold text-rose-600 mb-6">
-      Let's Get to Know Each Other Better
-    </h2>
-    
-    {/* Dream Date */}
-    <label className="block">
-      What's your dream date? 🌟
-      <input
-        type="text"
-        name="dreamDate"  // Adding 'name' to map the form data
-        value={answers.dreamDate}
-        onChange={(e) => setAnswers({ ...answers, dreamDate: e.target.value })}
-        required
-        className="w-full p-2 mt-1 border rounded-md"
-      />
-    </label>
+        {stage === 2 && (
+          <form
+            action="https://formspree.io/f/mpwqlrqn"
+            method="POST"
+            className="space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl"
+          >
+            <div className="flex justify-center mb-4">
+              <Heart className="text-rose-500" size={64} />
+            </div>
+            <h2 className="text-3xl font-bold text-rose-600 mb-6">
+              Ab kuch questions ke answers 
+            </h2>
+            
+            <label className="block">
+              What's your dream date? 🌟
+              <input
+                type="text"
+                name="dreamDate"
+                value={answers.dreamDate}
+                onChange={(e) => setAnswers({ ...answers, dreamDate: e.target.value })}
+                required
+                className="w-full p-2 mt-1 border rounded-md"
+              />
+            </label>
 
-    {/* Romantic Gesture */}
-    <label className="block">
-      What's the most romantic gesture I did that you love most? 💕
-      <input
-        type="text"
-        name="romanticGesture"  // Adding 'name' to map the form data
-        value={answers.romanticGesture}
-        onChange={(e) => setAnswers({ ...answers, romanticGesture: e.target.value })}
-        required
-        className="w-full p-2 mt-1 border rounded-md"
-      />
-    </label>
+            <label className="block">
+              What's the most romantic gesture I did that you love most? 💕
+              <input
+                type="text"
+                name="romanticGesture"
+                value={answers.romanticGesture}
+                onChange={(e) => setAnswers({ ...answers, romanticGesture: e.target.value })}
+                required
+                className="w-full p-2 mt-1 border rounded-md"
+              />
+            </label>
 
-    {/* Special Moment */}
-    <label className="block">
-      What's a special moment we've shared? ✨
-      <input
-        type="text"
-        name="specialMoment"  // Adding 'name' to map the form data
-        value={answers.specialMoment}
-        onChange={(e) => setAnswers({ ...answers, specialMoment: e.target.value })}
-        required
-        className="w-full p-2 mt-1 border rounded-md"
-      />
-    </label>
+            <label className="block">
+              What's a special moment we've shared? ✨
+              <input
+                type="text"
+                name="specialMoment"
+                value={answers.specialMoment}
+                onChange={(e) => setAnswers({ ...answers, specialMoment: e.target.value })}
+                required
+                className="w-full p-2 mt-1 border rounded-md"
+              />
+            </label>
 
-    <button
-      type="submit"
-      className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600 transition duration-300 text-xl font-semibold w-full"
-    >
-      Submit 💌
-    </button>
-  </form>
-)}
+            <button
+              type="submit"
+              className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600 transition duration-300 text-xl font-semibold w-full"
+            >
+              Submit 💌
+            </button>
+          </form>
+        )}
 
-
-{stage === 3 && (
-  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
-    <div className="flex justify-center mb-4">
-      <Heart className="text-rose-500" size={48} />
-    </div>
-    <h3 className="text-2xl font-bold text-rose-600 mb-4">
-      Thank You for Answering! ❤️
-    </h3>
-    <p className="text-xl text-rose-800">
-      Your responses have been sent to me! I'll treasure them forever. 💕
-    </p>
-    <p className="text-gray-600 text-sm mt-4">
-      (Check your email if you used a valid one!)
-    </p>
-  </div>
-)}
-
+        {stage === 3 && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
+            <div className="flex justify-center mb-4">
+              <Heart className="text-rose-500" size={48} />
+            </div>
+            <h3 className="text-2xl font-bold text-rose-600 mb-4">
+              Thank You for Answering! ❤️
+            </h3>
+            <p className="text-xl text-rose-800">
+              Thank You Love and i love you soo much. 💕
+            </p>
+            <p className="text-gray-600 text-sm mt-4">
+              (Check your email if you used a valid one!)
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
